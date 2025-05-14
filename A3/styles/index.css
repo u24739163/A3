@@ -1,0 +1,24 @@
+.category-filter {
+    max-width: 300px;
+    margin: 0 auto 2rem;
+}
+
+.form-select {
+    background-color: #fffaf7;
+    border: 2px solid #d2aa97;
+    color: #5a4a42;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(210, 170, 151, 0.1);
+}
+
+.form-select:focus {
+    border-color: #b38e7b;
+    box-shadow: 0 0 0 0.25rem rgba(210, 170, 151, 0.25);
+}
+
+.alert-info {
+    background-color: #fffaf7;
+    border-color: #d2aa97;
+    color: #5a4a42;
+}

@@ -44,7 +44,6 @@
 import { ref, computed, onMounted } from 'vue';
 import PostCard from '../components/BlogCard.vue';
 
-// Reactive state
 const posts = ref([]);
 const categories = ref([]);
 const loading = ref(true);
@@ -53,7 +52,6 @@ const selectedCategory = ref('none');
 const allPosts = ref([]);
 const config = useRuntimeConfig()
 
-// Computed property for filtered posts
 const filteredPosts = computed(() => {
   if (selectedCategory.value === 'none') return posts.value;
   
@@ -70,23 +68,20 @@ const filteredPosts = computed(() => {
   return finalArr || [];
 });
 
-// Fetch data
 onMounted(async () => {
   try {
-    // Fetch blog posts
     let response = await fetch('/api/strapi-send', {
       method: 'POST',
-      body: "http://localhost:1337/api/blog-posts?populate=author",
+      body: "http://strapi:1337/api/blog-posts?populate=author",
     });
     if (!response.ok) throw new Error('Failed to fetch blogs');
     let data = await response.json();
     posts.value = data.data;
     allPosts.value = [...posts.value];
 
-    // Fetch categories
     response = await fetch('/api/strapi-send', {
       method: 'POST',
-      body: "http://localhost:1337/api/categories?populate=blog_posts",
+      body: "http://strapi:1337/api/categories?populate=blog_posts",
     });
     if (!response.ok) throw new Error('Failed to fetch categories');
     data = await response.json();
@@ -99,33 +94,8 @@ onMounted(async () => {
     loading.value = false;
   }
 });
-
-// No need to explicitly define components in script setup - they're automatically available in template
 </script>
 
 <style scoped>
-.category-filter {
-    max-width: 300px;
-    margin: 0 auto 2rem;
-}
-
-.form-select {
-    background-color: #fffaf7;
-    border: 2px solid #d2aa97;
-    color: #5a4a42;
-    padding: 0.5rem 1rem;
-    border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(210, 170, 151, 0.1);
-}
-
-.form-select:focus {
-    border-color: #b38e7b;
-    box-shadow: 0 0 0 0.25rem rgba(210, 170, 151, 0.25);
-}
-
-.alert-info {
-    background-color: #fffaf7;
-    border-color: #d2aa97;
-    color: #5a4a42;
-}
+@import '../styles/index.css';
 </style>

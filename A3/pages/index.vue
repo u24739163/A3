@@ -2,10 +2,22 @@
     <div class="container py-5">
         <h1 class="display-4 text-center mb-5">All Blogs</h1>
         
-        <select>
-            <option value="none">Filter by Category</option>
-            <Category :categories=categories />
-        </select>
+        <div class="category-filter mb-4">
+            <select 
+                class="form-select"
+                v-model="selectedCategory"
+                @change="filterPostsByCategory"
+            >
+                <option value="none">Filter by Category</option>
+                <option 
+                    v-for="category in categories" 
+                    :key="category.id" 
+                    :value="category.Name"
+                >
+                    {{ category.Name }}
+                </option>
+            </select>
+        </div>
 
         <div v-if="loading" class="d-flex justify-content-center">
             <div class="spinner-border text-primary" role="status">
@@ -17,67 +29,108 @@
         <div v-else-if="error" class="alert alert-danger text-center">
             <strong>Error:</strong> {{ error }}
         </div>
-
+        <div v-else-if="filteredPosts.length === 0" class="alert alert-info text-center">
+            No blogs available in this category.
+        </div>
         <div v-else class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-            <div class="col" v-for="post in posts" :key="post.id">
+            <div class="col" v-for="post in filteredPosts" :key="post.id">
                 <PostCard :post="post" />
             </div>
         </div>
     </div>
 </template>
 
-<script>
+<script setup>
+import { ref, computed, onMounted } from 'vue';
 import PostCard from '../components/BlogCard.vue';
-import Category from '../components/Category.vue';
-export default {
-    components: {
-        PostCard
-    },
-    data() {
-        return {
-            posts: [],
-            categories: [],
-            loading: true,
-            error: null
-        }
-    },
-    async created() {
-        try {
-            var response = await fetch('http://localhost:1337/api/blog-posts?populate=author'
-            , {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer KEY`,
-                    'Content-Type': 'application/json'
-                }
-            }
-            );
-            if (!response.ok) throw new Error('Failed to fetch users');
-            var data = await response.json();
-            this.posts = data.data;
 
-            response = await fetch('http://localhost:1337/api/categories'
-            , {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer KEY`,
-                    'Content-Type': 'application/json'
-                }
-            }
-            );
-            if (!response.ok) throw new Error('Failed to fetch users');
-            data = await response.json();
-            this.categories = data.data;
-        } catch (err) {
-            this.error = err.message;
-            console.error('API Error:', err);
-        } finally {
-            this.loading = false;
-        }
-    }
-}
+// Reactive state
+const posts = ref([]);
+const categories = ref([]);
+const loading = ref(true);
+const error = ref(null);
+const selectedCategory = ref('none');
+const allPosts = ref([]);
+
+// Computed property for filtered posts
+const filteredPosts = computed(() => {
+  if (selectedCategory.value === 'none') return posts.value;
+  
+  const selectedCat = categories.value.find(cat => cat.Name === selectedCategory.value);
+  if (!selectedCat) return [];
+  
+  const selectedBlogs = selectedCat.blog_posts;
+  const finalArr = [];
+  
+  selectedBlogs.forEach(blog => {
+    finalArr.push(posts.value.find(post => post.id === blog.id));
+  });
+  
+  return finalArr || [];
+});
+
+// Fetch data
+onMounted(async () => {
+  try {
+    // Fetch blog posts
+    let response = await fetch('http://localhost:1337/api/blog-posts?populate=author', {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer 4a9eade45e37e248c118d45d4401837ddd4ec7a9d0ad20aa1aba493b7ea1debcfc5fef65bd7643b024f5d51753bd3d5b773b414ca08529d2e46be3ce7e38ec3c95586dc2acaf15d122a8be8604e0dcb3dbc67eb7dc511fa8c497d27af8eab22630984a61640ee7df279045f239b3d8b6da0ce13194bd10c530c0245f2787df61`,
+        'Content-Type': 'application/json'
+      }
+    });
+    if (!response.ok) throw new Error('Failed to fetch blogs');
+    let data = await response.json();
+    posts.value = data.data;
+    allPosts.value = [...posts.value];
+
+    // Fetch categories
+    response = await fetch('http://localhost:1337/api/categories?populate=blog_posts', {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer 4a9eade45e37e248c118d45d4401837ddd4ec7a9d0ad20aa1aba493b7ea1debcfc5fef65bd7643b024f5d51753bd3d5b773b414ca08529d2e46be3ce7e38ec3c95586dc2acaf15d122a8be8604e0dcb3dbc67eb7dc511fa8c497d27af8eab22630984a61640ee7df279045f239b3d8b6da0ce13194bd10c530c0245f2787df61`,
+        'Content-Type': 'application/json'
+      }
+    });
+    if (!response.ok) throw new Error('Failed to fetch categories');
+    data = await response.json();
+    categories.value = data.data;
+
+  } catch (err) {
+    error.value = err.message;
+    console.error('API Error:', err);
+  } finally {
+    loading.value = false;
+  }
+});
+
+// No need to explicitly define components in script setup - they're automatically available in template
 </script>
 
 <style scoped>
-/* You can keep any custom styles here if needed */
+.category-filter {
+    max-width: 300px;
+    margin: 0 auto 2rem;
+}
+
+.form-select {
+    background-color: #fffaf7;
+    border: 2px solid #d2aa97;
+    color: #5a4a42;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(210, 170, 151, 0.1);
+}
+
+.form-select:focus {
+    border-color: #b38e7b;
+    box-shadow: 0 0 0 0.25rem rgba(210, 170, 151, 0.25);
+}
+
+.alert-info {
+    background-color: #fffaf7;
+    border-color: #d2aa97;
+    color: #5a4a42;
+}
 </style>

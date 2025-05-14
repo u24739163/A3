@@ -39,44 +39,7 @@
   </div>
 </template>
 
-<script setup>
-import { ref, onMounted } from 'vue';
-import { useRoute } from 'vue-router';
 
-const route = useRoute();
-const post = ref([]);
-const error = ref(null);
-const loading = ref(true);
-const id = route.params.id;
-
-const formatDate = (dateString) => {
-  return new Date(dateString).toLocaleDateString();
-};
-
-const formatContent = (content) => {
-  return content;
-};
-
-onMounted(async () => {
-  try {
-    const response = await fetch(`http://localhost:1337/api/blog-posts?populate=author&filters[id][$eq]=${id}`, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer 4a9eade45e37e248c118d45d4401837ddd4ec7a9d0ad20aa1aba493b7ea1debcfc5fef65bd7643b024f5d51753bd3d5b773b414ca08529d2e46be3ce7e38ec3c95586dc2acaf15d122a8be8604e0dcb3dbc67eb7dc511fa8c497d27af8eab22630984a61640ee7df279045f239b3d8b6da0ce13194bd10c530c0245f2787df61`,
-        'Content-Type': 'application/json'
-      }
-    });
-    if (!response.ok) throw new Error('Failed to fetch Blog Post');
-    const data = await response.json();
-    post.value = data.data;
-  } catch (err) {
-    error.value = err.message;
-    console.error('API Error:', err);
-  } finally {
-    loading.value = false;
-  }
-});
-</script>
 
 <style scoped>
 .blog-container {

@@ -8,7 +8,7 @@
       <p class="card-text">{{ shortContent }}</p>
     </div>
     <div class="card-footer bg-transparent border-top-0">
-      <NuxtLink class="nav-link" to="/BlogPostPage">
+      <NuxtLink class="nav-link" :to="`/BlogPostPage/${post.id}`">
         <Button text="View Blog"/>
       </NuxtLink>
     </div>
@@ -17,6 +17,7 @@
 
 <script>
 import Button from './Button.vue';
+import { useRoute } from 'vue-router';
 export default {
   props: {
     post: {
@@ -29,6 +30,8 @@ export default {
       if (!this.post.Content) return '';
       return this.post.Content.substring(0, 100) + '...';
     }
+
+
   }
 }
 </script>

@@ -421,8 +421,8 @@ export interface ApiBlogPostBlogPost extends Struct.CollectionTypeSchema {
   };
   attributes: {
     author: Schema.Attribute.Relation<'oneToOne', 'api::author.author'>;
-    categories: Schema.Attribute.Relation<
-      'oneToMany',
+    CategoryBlogs: Schema.Attribute.Relation<
+      'manyToOne',
       'api::category.category'
     >;
     Content: Schema.Attribute.RichText;
@@ -446,6 +446,7 @@ export interface ApiBlogPostBlogPost extends Struct.CollectionTypeSchema {
 export interface ApiCategoryCategory extends Struct.CollectionTypeSchema {
   collectionName: 'categories';
   info: {
+    description: '';
     displayName: 'Category';
     pluralName: 'categories';
     singularName: 'category';
@@ -454,6 +455,10 @@ export interface ApiCategoryCategory extends Struct.CollectionTypeSchema {
     draftAndPublish: true;
   };
   attributes: {
+    blog_posts: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::blog-post.blog-post'
+    >;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;

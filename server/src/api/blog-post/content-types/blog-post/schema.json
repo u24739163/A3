@@ -22,10 +22,11 @@
       "relation": "oneToOne",
       "target": "api::author.author"
     },
-    "categories": {
+    "CategoryBlogs": {
       "type": "relation",
-      "relation": "oneToMany",
-      "target": "api::category.category"
+      "relation": "manyToOne",
+      "target": "api::category.category",
+      "inversedBy": "blog_posts"
     }
   }
 }

@@ -51,6 +51,7 @@ const loading = ref(true);
 const error = ref(null);
 const selectedCategory = ref('none');
 const allPosts = ref([]);
+const config = useRuntimeConfig()
 
 // Computed property for filtered posts
 const filteredPosts = computed(() => {
@@ -73,12 +74,9 @@ const filteredPosts = computed(() => {
 onMounted(async () => {
   try {
     // Fetch blog posts
-    let response = await fetch('http://localhost:1337/api/blog-posts?populate=author', {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer 4a9eade45e37e248c118d45d4401837ddd4ec7a9d0ad20aa1aba493b7ea1debcfc5fef65bd7643b024f5d51753bd3d5b773b414ca08529d2e46be3ce7e38ec3c95586dc2acaf15d122a8be8604e0dcb3dbc67eb7dc511fa8c497d27af8eab22630984a61640ee7df279045f239b3d8b6da0ce13194bd10c530c0245f2787df61`,
-        'Content-Type': 'application/json'
-      }
+    let response = await fetch('/api/strapi-send', {
+      method: 'POST',
+      body: "http://localhost:1337/api/blog-posts?populate=author",
     });
     if (!response.ok) throw new Error('Failed to fetch blogs');
     let data = await response.json();
@@ -86,12 +84,9 @@ onMounted(async () => {
     allPosts.value = [...posts.value];
 
     // Fetch categories
-    response = await fetch('http://localhost:1337/api/categories?populate=blog_posts', {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer 4a9eade45e37e248c118d45d4401837ddd4ec7a9d0ad20aa1aba493b7ea1debcfc5fef65bd7643b024f5d51753bd3d5b773b414ca08529d2e46be3ce7e38ec3c95586dc2acaf15d122a8be8604e0dcb3dbc67eb7dc511fa8c497d27af8eab22630984a61640ee7df279045f239b3d8b6da0ce13194bd10c530c0245f2787df61`,
-        'Content-Type': 'application/json'
-      }
+    response = await fetch('/api/strapi-send', {
+      method: 'POST',
+      body: "http://localhost:1337/api/categories?populate=blog_posts",
     });
     if (!response.ok) throw new Error('Failed to fetch categories');
     data = await response.json();

@@ -2,7 +2,7 @@ export default defineEventHandler(async (event) => {
     const config = useRuntimeConfig();
     const body = await readBody(event);
 
-    await $fetch(body, {
+    return await $fetch(body, {
         method: 'GET',
         headers: 
         {
@@ -11,4 +11,4 @@ export default defineEventHandler(async (event) => {
         },
     });
 
-})
+});

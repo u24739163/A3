@@ -39,7 +39,42 @@
   </div>
 </template>
 
+<script setup>
+import { ref, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
 
+const route = useRoute();
+const post = ref([]);
+const error = ref(null);
+const loading = ref(true);
+const id = route.params.id;
+
+const formatDate = (dateString) => {
+  return new Date(dateString).toLocaleDateString();
+};
+
+const formatContent = (content) => {
+  return content;
+};
+
+onMounted(async () => {
+  try {
+      const response = await fetch('/api/strapi-send', {
+      method: 'POST',
+      body: `http://localhost:1337/api/blog-posts?populate=author&filters[id][$eq]=${id}`,
+      });
+
+    if (!response.ok) throw new Error('Failed to fetch Blog Post');
+    const data = await response.json();
+    post.value = data.data;
+  } catch (err) {
+    error.value = err.message;
+    console.error('API Error:', err);
+  } finally {
+    loading.value = false;
+  }
+});
+</script>
 
 <style scoped>
 .blog-container {
